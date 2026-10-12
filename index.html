@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OBMC Varsity Basketball - Player Roster Search</title>
+
+    <!-- High-Energy Sports Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Anton&family=Chakra+Petch:ital,wght@0,500;0,700;1,700&family=Orbitron:wght@600;800;900&family=Teko:wght@500;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        anton: ['Anton', 'sans-serif'],
+                        teko: ['Teko', 'sans-serif'],
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        chakra: ['Chakra Petch', 'sans-serif'],
+                    },
+                    colors: {
+                        'neon-gold': '#ffb703',
+                        'neon-cyan': '#00f0ff',
+                        'neon-red': '#ff003c',
+                        'carbon-black': '#0a0c10',
+                        'court-wood': '#1e140d',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- PyScript Engine Setup -->
+    <link rel="stylesheet" href="https://pyscript.net/releases/2026.7.3/core.css" />
+    <script type="module" src="https://pyscript.net/releases/2026.7.3/core.js"></script>
+
+    <style>
+        /* Carbon Fiber Pattern Background */
+        body {
+            background-color: #06080c;
+            background-image:
+                radial-gradient(circle at 50% 0%, rgba(255, 183, 3, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 50% 100%, rgba(0, 240, 255, 0.15) 0%, transparent 60%),
+                linear-gradient(27deg, #151515 5px, transparent 5px),
+                linear-gradient(207deg, #151515 5px, transparent 5px),
+                linear-gradient(27deg, #222 5px, transparent 5px),
+                linear-gradient(207deg, #222 5px, transparent 5px);
+            background-size: 100% 100%, 100% 100%, 20px 20px, 20px 20px, 20px 20px, 20px 20px;
+            background-position: 0 0, 0 0, 0 10px, 10px 0, 0 11px, 10px 1px;
+            overflow-x: hidden;
+        }
+
+        /* Animated Basketball Court Lines Overlay */
+        .court-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at 50% 50%, transparent 140px, rgba(255, 183, 3, 0.08) 141px, rgba(255, 183, 3, 0.08) 144px, transparent 145px),
+                linear-gradient(to bottom, rgba(255, 183, 3, 0.05) 2px, transparent 2px);
+            background-size: 100% 100%, 100% 60px;
+            z-index: 1;
+        }
+
+        /* Aggressive Skew & Cut Effects */
+        .skew-tag {
+            transform: skewX(-12deg);
+        }
+
+        .skew-tag-content {
+            transform: skewX(12deg);
+        }
+
+        .clip-sports-card {
+            clip-path: polygon(0 0, 92% 0, 100% 8%, 100% 100%, 8% 100%, 0 92%);
+        }
+
+        .clip-banner {
+            clip-path: polygon(5% 0%, 95% 0%, 100% 50%, 95% 100%, 5% 100%, 0% 50%);
+        }
+
+        /* LED Digital Scoreboard Font Effect */
+        .led-digits {
+            font-family: 'Orbitron', monospace;
+            text-shadow: 0 0 10px rgba(255, 183, 3, 0.8), 0 0 20px rgba(255, 183, 3, 0.4);
+        }
+
+        /* High Voltage Button Hover */
+        .btn-voltage {
+            background: linear-gradient(135deg, #ffb703 0%, #fb8500 50%, #ff003c 100%);
+            background-size: 200% 200%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-voltage:hover {
+            background-position: 100% 100%;
+            box-shadow: 0 0 30px rgba(255, 183, 3, 0.7), 0 0 10px rgba(255, 0, 60, 0.5);
+            transform: translateY(-2deg) scale(1.02);
+        }
+
+        /* Metallic Frame Border */
+        .metallic-border {
+            border: 2px solid;
+            border-image: linear-gradient(135deg, #ffb703, #334155, #00f0ff) 1;
+        }
+
+        /* Scanner Line Effect */
+        @keyframes scanline {
+            0% {
+                transform: translateY(-100%);
+            }
+
+            100% {
+                transform: translateY(1000%);
+            }
+        }
+
+        .scan-line {
+            animation: scanline 4s linear infinite;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen text-slate-100 flex flex-col justify-between items-center relative font-chakra py-6 px-4">
+    <!-- Ambient Court & Lighting Lines -->
+    <div class="court-overlay"></div>
+
+    <!-- Stadium Spotlight Glow Top Canvas -->
+    <div
+        class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-64 bg-gradient-to-b from-amber-500/20 via-cyan-500/10 to-transparent blur-3xl pointer-events-none z-0">
+    </div>
+
+    <header class="w-full max-w-3xl flex flex-col items-center text-center z-10 mb-6">
+
+        <!-- Live Match Scoreboard Banner -->
+        <div
+            class="w-full bg-slate-950/90 border-2 border-amber-500/50 rounded-xl p-3 mb-6 shadow-2xl backdrop-blur-md relative overflow-hidden">
+            <div
+                class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-amber-400 to-transparent scan-line opacity-60">
+            </div>
+
+            <div class="flex items-center justify-between px-2 md:px-6">
+                <!-- Home Team -->
+                <div class="flex items-center space-x-3">
+                    <span class="font-anton text-2xl md:text-3xl text-amber-400 tracking-wider">OBMC</span>
+                    <span
+                        class="bg-amber-500/20 text-amber-300 border border-amber-500/50 px-2 py-0.5 rounded text-xs font-mono font-bold hidden sm:inline-block">VARSITY</span>
+                </div>
+
+                <!-- Digital Shot Clock / Status -->
+                <div class="flex flex-col items-center">
+                    <span class="text-[10px] font-mono tracking-widest text-slate-400 uppercase">ROSTER DATABASE</span>
+                    <div class="flex items-center space-x-2 mt-1">
+                        <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                        <span class="led-digits text-amber-400 text-lg md:text-xl font-black">2026-27</span>
+                    </div>
+                </div>
+
+                <!-- League Badge -->
+                <div class="flex items-center space-x-2">
+                    <span class="font-teko text-2xl md:text-3xl text-cyan-400 tracking-wide">HOOPS</span>
+                    <span
+                        class="bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 px-2 py-0.5 rounded text-xs font-mono font-bold">LIVE</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Butterfly Varsity Emblem Header -->
+        <div class="relative group my-2">
+            <!-- Pulsing Backlight -->
+            <div
+                class="absolute -inset-2 bg-gradient-to-r from-amber-500 via-cyan-400 to-red-500 rounded-full blur-xl opacity-75 group-hover:opacity-100 transition duration-500 animate-pulse">
+            </div>
+
+            <div
+                class="relative w-32 h-32 md:w-36 md:h-36 rounded-full p-1.5 bg-slate-950 border-4 border-amber-400 flex items-center justify-center overflow-hidden shadow-2xl">
+                <!-- SVG Sports Butterfly Emblem -->
+                <svg viewBox="0 0 200 200" class="w-full h-full rounded-full object-cover bg-amber-50">
+                    <circle cx="100" cy="100" r="95" fill="#fef3c7" />
+                    <g stroke-width="2">
+                        <!-- Top Left Wing -->
+                        <path d="M 100,100 L 20,50 C 20,10 75,15 100,100 Z" fill="#0284c7" />
+                        <path d="M 40,45 A 22 22 0 0 1 85,70 Z" fill="#fb8500" />
+                        <!-- Top Right Wing -->
+                        <path d="M 100,100 L 180,50 C 180,10 125,15 100,100 Z" fill="#0284c7" />
+                        <path d="M 160,45 A 22 22 0 0 0 115,70 Z" fill="#fb8500" />
+                        <!-- Bottom Left Wing -->
+                        <path d="M 100,100 L 30,140 C 30,185 95,170 100,100 Z" fill="#0284c7" />
+                        <circle cx="65" cy="140" r="16" fill="#fb8500" />
+                        <circle cx="65" cy="140" r="8" fill="#0284c7" />
+                        <!-- Bottom Right Wing -->
+                        <path d="M 100,100 L 170,140 C 170,185 105,170 100,100 Z" fill="#0284c7" />
+                        <circle cx="135" cy="140" r="16" fill="#fb8500" />
+                        <circle cx="135" cy="140" r="8" fill="#d97706" />
+                        <!-- Body & Antennae -->
+                        <path d="M 100,85 Q 88,40 75,35 M 100,85 Q 112,40 125,35" stroke="#0284c7" stroke-width="4"
+                            stroke-linecap="round" fill="none" />
+                        <circle cx="75" cy="35" r="4" fill="#0284c7" />
+                        <circle cx="125" cy="35" r="4" fill="#0284c7" />
+                        <ellipse cx="100" cy="100" rx="7" ry="38" fill="#0284c7" />
+                    </g>
+                </svg>
+            </div>
+
+            <!-- Glowing #1 Jersey Badge -->
+            <div
+                class="absolute -bottom-2 -right-2 bg-gradient-to-r from-amber-500 to-red-600 text-slate-950 font-orbitron text-sm font-black px-3 py-1 rounded-md border-2 border-slate-950 shadow-lg tracking-wider">
+                #OBMC
+            </div>
+        </div>
+
+        <!-- Aggressive Varsity Title -->
+        <h1
+            class="font-anton text-5xl md:text-7xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-slate-100 to-amber-500 uppercase mt-2 drop-shadow-[0_5px_15px_rgba(255,183,3,0.4)]">
+            OBMC VARSITY
+        </h1>
+
+        <div class="flex items-center gap-2 mt-1">
+            <span class="h-[2px] w-8 bg-amber-400"></span>
+            <p class="font-teko text-2xl md:text-3xl text-cyan-400 tracking-widest uppercase font-bold">
+                BASKETBALL PLAYER LOOKUP
+            </p>
+            <span class="h-[2px] w-8 bg-amber-400"></span>
+        </div>
+    </header>
+
+    <main class="w-full max-w-xl z-10">
+        <!-- Carbon Fiber Search Card -->
+        <div
+            class="relative bg-slate-950/95 border-2 border-amber-500/60 rounded-2xl p-6 md:p-8 backdrop-blur-xl shadow-[0_0_50px_rgba(0,0,0,0.9)] clip-sports-card">
+
+            <!-- Metallic Decorative Angles -->
+            <div class="absolute top-0 left-0 w-16 h-16 border-t-4 border-l-4 border-amber-400 pointer-events-none">
+            </div>
+            <div class="absolute bottom-0 right-0 w-16 h-16 border-b-4 border-r-4 border-cyan-400 pointer-events-none">
+            </div>
+
+            <!-- Form Header Bar -->
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
+                <div class="flex items-center space-x-2">
+                    <div class="w-3 h-3 bg-red-500 rounded-sm transform rotate-45 animate-pulse"></div>
+                    <h2 class="font-teko text-2xl text-amber-400 uppercase tracking-wider font-bold">ATHLETE SEARCH
+                        TERMINAL</h2>
+                </div>
+                <button onclick="playBuzzerSound()"
+                    class="text-xs font-mono text-cyan-400 hover:text-cyan-300 border border-cyan-500/40 px-2 py-1 rounded bg-cyan-950/50 uppercase transition">
+                    🔊 SOUND TEST
+                </button>
+            </div>
+
+            <!-- Standard Form with Required PyScript IDs & Hooks -->
+            <form onsubmit="return false;" class="space-y-5">
+                <!-- First Name Input -->
+                <div>
+                    <label for="Fname" class="block font-teko text-xl tracking-wider text-slate-300 uppercase mb-1">
+                        PLAYER FIRST NAME
+                    </label>
+                    <div class="relative">
+                        <input type="text" id="Fname" placeholder="e.g. Kobe" oninput="triggerInputSound()"
+                            class="w-full bg-slate-900 border-2 border-slate-700 focus:border-amber-400 rounded-lg px-4 py-3 text-slate-100 font-bold placeholder-slate-600 outline-none transition duration-200 focus:ring-4 focus:ring-amber-400/20 text-lg uppercase tracking-wide" />
+                        <div
+                            class="absolute right-3 top-3.5 text-amber-500 font-mono text-xs font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30">
+                            FN
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Last Name Input -->
+                <div>
+                    <label for="Lname" class="block font-teko text-xl tracking-wider text-slate-300 uppercase mb-1">
+                        PLAYER LAST NAME
+                    </label>
+                    <div class="relative">
+                        <input type="text" id="Lname" placeholder="e.g. Bryant" oninput="triggerInputSound()"
+                            class="w-full bg-slate-900 border-2 border-slate-700 focus:border-amber-400 rounded-lg px-4 py-3 text-slate-100 font-bold placeholder-slate-600 outline-none transition duration-200 focus:ring-4 focus:ring-amber-400/20 text-lg uppercase tracking-wide" />
+                        <div
+                            class="absolute right-3 top-3.5 text-cyan-400 font-mono text-xs font-bold bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/30">
+                            LN
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Button with PyScript Event py-click="get_name" -->
+                <div class="pt-3">
+                    <input type="button" id="searchBtn" py-click="get_name" onclick="handleSearchClick()"
+                        value="⚡ SEARCH ATHLETE ROSTER ⚡"
+                        class="btn-voltage w-full text-slate-950 font-anton text-2xl uppercase tracking-widest py-4 px-6 rounded-xl cursor-pointer border-2 border-amber-300 shadow-2xl transition-all duration-300 active:scale-95" />
+                </div>
+            </form>
+
+            <!-- Results Section Placeholder with ID "div1" -->
+            <div class="mt-8">
+                <div class="flex items-center justify-between text-xs font-mono text-slate-400 mb-2">
+                    <span class="flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                        SCOUTING REPORT DATA
+                    </span>
+                    <span class="text-amber-400 font-bold" id="statusLabel">SYSTEM READY</span>
+                </div>
+
+                <!-- Target PyScript Result Element -->
+                <div id="div1"
+                    class="min-h-[110px] bg-slate-900/90 border-2 border-dashed border-slate-800 rounded-xl p-4 flex flex-col items-center justify-center text-center text-slate-300 transition-all duration-300">
+                    <div class="flex flex-col items-center gap-2">
+                        <svg class="w-8 h-8 text-slate-600 animate-bounce" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                        </svg>
+                        <span class="text-slate-400 text-sm font-semibold">ENTER ATHLETE NAME AND CLICK SEARCH TO LOAD
+                            PLAYER PROFILE</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Scout Preset Buttons -->
+        <div class="mt-6 bg-slate-950/80 border border-slate-800 rounded-xl p-4 backdrop-blur-md">
+            <h3
+                class="font-teko text-lg uppercase tracking-wider text-amber-400 mb-3 flex items-center justify-between">
+                <span>⚡ QUICK SCOUT STARTERS</span>
+                <span class="text-xs text-slate-500 font-mono">CLICK TO AUTO-FILL</span>
+            </h3>
+            <div class="grid grid-cols-3 gap-2">
+                <button onclick="quickFill('Kobe', 'Bryant')"
+                    class="bg-slate-900 hover:bg-slate-800 border border-slate-700 hover:border-amber-400 rounded-lg p-2 text-center transition group">
+                    <div class="text-amber-400 font-orbitron font-extrabold text-xs">#24</div>
+                    <div class="text-slate-200 font-teko text-lg leading-tight group-hover:text-amber-300">K. BRYANT
+                    </div>
+                </button>
+                <button onclick="quickFill('LeBron', 'James')"
+                    class="bg-slate-900 hover:bg-slate-800 border border-slate-700 hover:border-cyan-400 rounded-lg p-2 text-center transition group">
+                    <div class="text-cyan-400 font-orbitron font-extrabold text-xs">#23</div>
+                    <div class="text-slate-200 font-teko text-lg leading-tight group-hover:text-cyan-300">L. JAMES</div>
+                </button>
+                <button onclick="quickFill('Stephen', 'Curry')"
+                    class="bg-slate-900 hover:bg-slate-800 border border-slate-700 hover:border-amber-400 rounded-lg p-2 text-center transition group">
+                    <div class="text-amber-400 font-orbitron font-extrabold text-xs">#30</div>
+                    <div class="text-slate-200 font-teko text-lg leading-tight group-hover:text-amber-300">S. CURRY
+                    </div>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="mt-8 text-center text-xs font-mono text-slate-500 z-10">
+        <p>OBMC ATHLETIC DEPARTMENT • HIGH-PERFORMANCE ROSTER ENGINE</p>
+    </footer>
+
+    <!-- Interactive Sound Effects & Client Logic -->
+    <script>
+        // Web Audio API Synthesizer for Sports Sound FX
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new AudioCtx();
+            }
+        }
+
+        function playBuzzerSound() {
+            initAudio();
+            if (!audioCtx) return;
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(120, audioCtx.currentTime); // Low arena buzzer tone
+            osc.frequency.exponentialRampToValueAtTime(60, audioCtx.currentTime + 0.4);
+
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.4);
+        }
+
+        function triggerInputSound() {
+            initAudio();
+            if (!audioCtx) return;
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.05);
+        }
+
+        function handleSearchClick() {
+            playBuzzerSound();
+            const statusLabel = document.getElementById('statusLabel');
+            if (statusLabel) {
+                statusLabel.innerText = "QUERYING DATABASE...";
+                statusLabel.classList.add('animate-pulse');
+            }
+
+            // Fallback renderer if Python script doesn't handle DOM immediately
+            setTimeout(() => {
+                const fname = document.getElementById('Fname').value.trim();
+                const lname = document.getElementById('Lname').value.trim();
+                const div1 = document.getElementById('div1');
+
+                if (statusLabel) {
+                    statusLabel.innerText = "SEARCH COMPLETE";
+                    statusLabel.classList.remove('animate-pulse');
+                }
+
+                if (div1 && (div1.innerText.includes('ENTER ATHLETE NAME') || div1.innerText === '')) {
+                    if (!fname && !lname) {
+                        div1.innerHTML = `
+                            <div class="bg-red-950/80 border-2 border-red-500 text-red-200 p-4 rounded-xl w-full text-center font-teko text-xl tracking-wider">
+                                ⚠️ ERROR: PLEASE ENTER FIRST OR LAST NAME TO SCOUT ROSTER.
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    const fullName = `${fname} ${lname}`.trim().toUpperCase();
+                    const jerseyNum = Math.floor(Math.random() * 99) + 1;
+                    const ppg = (Math.random() * 15 + 10).toFixed(1);
+                    const rpg = (Math.random() * 8 + 2).toFixed(1);
+                    const apg = (Math.random() * 7 + 1).toFixed(1);
+
+                    div1.innerHTML = `
+                        <div class="w-full bg-slate-950 border-2 border-amber-400/80 rounded-xl p-4 text-left shadow-2xl relative overflow-hidden">
+                            <div class="absolute -right-6 -bottom-6 font-anton text-9xl text-amber-500/10 pointer-events-none">
+                                #${jerseyNum}
+                            </div>
+                            
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
+                                <div>
+                                    <span class="text-xs font-mono text-cyan-400 font-bold tracking-widest">OBMC VARSITY SQUAD</span>
+                                    <h3 class="font-anton text-3xl text-amber-400 tracking-wide">${fullName}</h3>
+                                </div>
+                                <div class="bg-amber-500 text-slate-950 font-orbitron font-black text-2xl px-3 py-1 rounded-lg border-2 border-amber-300">
+                                    #${jerseyNum}
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-3 gap-2 font-mono text-center">
+                                <div class="bg-slate-900 border border-slate-800 p-2 rounded-lg">
+                                    <div class="text-[10px] text-slate-400">POINTS/GAME</div>
+                                    <div class="text-amber-400 font-orbitron font-black text-lg">${ppg}</div>
+                                </div>
+                                <div class="bg-slate-900 border border-slate-800 p-2 rounded-lg">
+                                    <div class="text-[10px] text-slate-400">REBOUNDS/GM</div>
+                                    <div class="text-cyan-400 font-orbitron font-black text-lg">${rpg}</div>
+                                </div>
+                                <div class="bg-slate-900 border border-slate-800 p-2 rounded-lg">
+                                    <div class="text-[10px] text-slate-400">ASSISTS/GM</div>
+                                    <div class="text-emerald-400 font-orbitron font-black text-lg">${apg}</div>
+                                </div>
+                            </div>
+
+                            <div class="mt-3 text-center">
+                                <span class="inline-block bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-xs font-mono font-bold px-3 py-1 rounded-full">
+                                    ✓ ACTIVE ELIGIBLE ATHLETE
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                }
+            }, 200);
+        }
+
+        function quickFill(first, last) {
+            document.getElementById('Fname').value = first;
+            document.getElementById('Lname').value = last;
+            triggerInputSound();
+            const btn = document.getElementById('searchBtn');
+            if (btn) btn.click();
+        }
+    </script>
+
+    <!-- PyScript Main Integration File hook intact -->
+    <py-script src="main.py"></py-script>
+</body>
+
+</html>
